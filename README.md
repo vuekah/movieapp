@@ -1,4 +1,3 @@
 # Buid Movie App
-
-<img src="https://res.cloudinary.com/dxiw0dtev/image/upload/v1730433640/e7snwsfxwkasbli3u85z.gif" width="50%"/>
+<img src="https://res.cloudinary.com/dxiw0dtev/image/upload/f_auto,q_auto/fvg4z2qkt1y28zwkymoo" width="50%"/>
 
