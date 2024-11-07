@@ -12,33 +12,26 @@ import MBProgressHUD
 
 protocol MovieViewModelDelegate: AnyObject {
     func initializeMovie(_ result: [Result]?)
-}
+    func loading()
+    func complete()
+    func showError(_ e:String)}
 
 class MovieViewModel {
     weak var delegate: MovieViewModelDelegate?
     private(set) var movie: MovieModel?
     
-    func initialize(_ page: Int,_ view : UIView) {
+    func initialize(_ page: Int) {
+        self.delegate?.loading()
         URLSession.shared.dataTask(with: URLRequest(url: URL( string: Constants.URL+String(page))!)){
             (data,req,err) in do{
-                DispatchQueue.main.async {
-                    MBProgressHUD.showAdded(to: view, animated: true)
-                }
-                
                 let result = try JSONDecoder().decode(MovieModel.self, from: data!)
-                DispatchQueue.main.async {
-                    
-                    self.delegate?.initializeMovie(result.results)
-                    
-                }
-                
+                self.delegate?.initializeMovie(result.results)
             }catch{
-                //                print(error)
+                self.delegate?.showError(error.localizedDescription)
             }
-            DispatchQueue.main.async {
-                MBProgressHUD.hide(for: view, animated: true)
-            }
+            self.delegate?.complete()
         }.resume()
+        
     }
     
     

@@ -25,7 +25,7 @@ class ViewController: UIViewController {
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
         mTableView.register(UINib(nibName: "TableViewCell", bundle: nil), forCellReuseIdentifier: "cell")
-        movieModel.initialize(indexPage, self.view)
+        movieModel.initialize(indexPage)
     }
 }
 
@@ -43,7 +43,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 160
     }
-
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "showdetail", sender: self)
     }
@@ -56,6 +56,27 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
 }
 
 extension ViewController: MovieViewModelDelegate {
+    func loading() {
+        DispatchQueue.main.async {
+            MBProgressHUD.showAdded(to: self.view, animated: true)
+        }
+    }
+    
+    func complete() {
+        DispatchQueue.main.async {
+            MBProgressHUD.hide(for: self.view, animated: true)
+        }
+    }
+    
+    func showError(_ e: String) {
+        DispatchQueue.main.async{
+            let alert = UIAlertController(title: "Error", message: e, preferredStyle: .alert)
+            let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+            alert.addAction(action)
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
     func initializeMovie(_ result: [Result]?) {
         guard let result = result else { return }
         
@@ -65,7 +86,10 @@ extension ViewController: MovieViewModelDelegate {
         }
         
         self.dataList.append(contentsOf: result)
-        mTableView.reloadData()
+        DispatchQueue.main.async {
+            self.mTableView.reloadData()
+        }
+        
     }
 }
 
@@ -77,7 +101,7 @@ extension ViewController: UIScrollViewDelegate {
         if offsetY > contentHeight - scrollView.frame.size.height - 100 {
             if !isEndOfPage {
                 indexPage += 1
-                movieModel.initialize(indexPage, self.view)
+                movieModel.initialize(indexPage)
             }
         }
     }

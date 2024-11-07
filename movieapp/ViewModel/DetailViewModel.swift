@@ -9,39 +9,30 @@ import Foundation
 import MBProgressHUD
 
 protocol DetailViewModelDelegate: AnyObject {
+    func loading()
     func didUpdateDetail(_ runtime: Int)
+    func completed()
+    func showError(_ e: String)
 }
 
 class DetailViewModel {
     weak var delegate: DetailViewModelDelegate?
     private(set) var detail: DetailModel?
-
-    func fetchDetail(id: Int,_ view:UIView) {
-        
-//        print("\(Constants.DETAIL_MOVIE)\(id)?\(Constants.LANGUAGE)&\(Constants.API_KEY)")
-        
+    
+    func fetchDetail(id: Int) {
         guard let url = URL(string: "\(Constants.DETAIL_MOVIE)\(id)?\(Constants.LANGUAGE)&\(Constants.API_KEY)") else {
             print("sai URL")
             return
         }
-
+        self.delegate?.loading()
         URLSession.shared.dataTask(with: URLRequest(url: url)) { [weak self] (data, response, error) in
             do {
-
                 let result = try JSONDecoder().decode(DetailModel.self, from: data!)
-//                print(result.runtime)
-                DispatchQueue.main.async {
-//                    MBProgressHUD.showAdded(to: view, animated: true)
-//
-                    self?.delegate?.didUpdateDetail(result.runtime)
-                }
+                self?.delegate?.didUpdateDetail(result.runtime)
             } catch {
-                print(error)
+                self?.delegate?.showError(error.localizedDescription)
             }
-//            DispatchQueue.main.async {
-//                MBProgressHUD.hide(for:view , animated: true)
-//            }
-            
+            self?.delegate?.completed()
         }.resume()
     }
 }

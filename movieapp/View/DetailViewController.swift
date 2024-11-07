@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import MBProgressHUD
 
 class DetailViewController: UIViewController {
     
@@ -45,7 +46,7 @@ class DetailViewController: UIViewController {
             dateLabel.text = data.releaseDate.components(separatedBy: "-")[0]
             typeLabel.text = genreNames[0]
             descriptionLabel.text = data.overview
-            detailModel.fetchDetail(id: data.id,self.view)
+            detailModel.fetchDetail(id: data.id)
         }
     }
     
@@ -82,11 +83,33 @@ class DetailViewController: UIViewController {
 }
 
 extension DetailViewController:DetailViewModelDelegate{
+    func loading() {
+        DispatchQueue.main.async {
+            MBProgressHUD.showAdded(to: self.view, animated: true)
+        }
+    }
+    
+    func completed() {
+        DispatchQueue.main.async {
+            MBProgressHUD.hide(for: self.view, animated: true)
+        }
+    }
+    
+    func showError(_ e: String) {
+        DispatchQueue.main.async{
+            let alert = UIAlertController(title: "Error", message: e, preferredStyle: .alert)
+            let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+            alert.addAction(action)
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
     func didUpdateDetail(_ runtime: Int)
     {
-        runtimeLabel.text = "\(runtime) minutes"
         
-        self.updateViewConstraints()
+        DispatchQueue.main.async {
+            self.runtimeLabel.text = "\(runtime) minutes";
+            self.updateViewConstraints()}
         
     }
 }
