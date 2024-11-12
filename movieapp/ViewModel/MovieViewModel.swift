@@ -27,7 +27,7 @@ class MovieViewModel {
                 let result = try JSONDecoder().decode(MovieModel.self, from: data!)
                 self.delegate?.initializeMovie(result.results)
             }catch{
-                self.delegate?.showError(error.localizedDescription)
+                print(error.localizedDescription)
             }
             self.delegate?.complete()
         }.resume()
